@@ -251,7 +251,7 @@ install_docker() {
         echo -e "${YELLOW}Docker Compose已安装。${NC}"
     fi
 
-    read -p "按回车键返回菜单..."
+  
 }
 
 # 显示菜单
