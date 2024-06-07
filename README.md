@@ -58,7 +58,7 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
    WEB_PORT=8281
 
    owl后台管理api地址
-   DOMAIN=http://${SERVER_IP}:${ADMIN_PORT}/api
+   API_URL=http://${SERVER_IP}:${ADMIN_PORT}/api
 
 #### 安装MySQL
 
