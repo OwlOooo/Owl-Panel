@@ -22,7 +22,7 @@ services:
       JDBC_TYPE: mysql
       JDBC_DRIVER: com.mysql.cj.jdbc.Driver
       JDBC_URL: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${OWL_DATABASE}?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
-      JDBC_USERNAME: root
+      JDBC_USERNAME: ${MYSQL_USERNAME}
       JDBC_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       JDBC_TEST_SQL: SELECT 1
     depends_on:
@@ -50,7 +50,7 @@ services:
     environment:
       DB_MYSQL_HOST: ${MYSQL_HOST}
       DB_MYSQL_PORT: ${MYSQL_PORT}
-      DB_MYSQL_USER: root
+      DB_MYSQL_USER: ${MYSQL_USERNAME}
       DB_MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       DB_MYSQL_NAME: ${MYSQL_DATABASE}
     volumes:
