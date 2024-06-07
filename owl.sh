@@ -57,147 +57,52 @@ check_env() {
     return 0
 }
 
-# 函数定义
-pull_admin() {
-    echo -e "${GREEN}拉取最新的 owl_admin 镜像...${NC}"
-    docker-compose pull owl_admin
-    docker-compose stop owl_admin
-    docker-compose rm -f owl_admin
-    docker-compose up -d owl_admin
-    docker images -f "dangling=true" -q | xargs -r docker rmi
-    docker volume prune -f
-    docker logs -f owl_admin
-}
+# 通用函数
+manage_service() {
+    local action=$1
+    local service=$2
 
-pull_web() {
-    echo -e "${GREEN}拉取最新的 owl_web 镜像...${NC}"
-    docker-compose pull owl_web
-    docker-compose stop owl_web
-    docker-compose rm -f owl_web
-    docker-compose up -d owl_web
-    docker images -f "dangling=true" -q | xargs -r docker rmi
-    docker volume prune -f
-    docker logs -f owl_web
-}
-
-restart_admin() {
-    echo -e "${GREEN}重启 owl_admin 容器...${NC}"
-    docker-compose restart owl_admin
-}
-
-restart_web() {
-    echo -e "${GREEN}重启 owl_web 容器...${NC}"
-    docker-compose restart owl_web
-}
-
-restart_mysql() {
-    echo -e "${GREEN}重启 mysql 容器...${NC}"
-    docker-compose restart mysql
-}
-
-restart_nginx() {
-    echo -e "${GREEN}重启 nginx 容器...${NC}"
-    docker-compose restart nginx
-}
-
-stop_admin() {
-    if [ "$(docker inspect -f '{{.State.Running}}' owl_admin)" == "false" ]; then
-        echo -e "${YELLOW}容器已经停止。${NC}"
-    else
-        echo -e "${GREEN}停止 owl_admin 容器...${NC}"
-        docker-compose stop owl_admin
-        echo -e "${GREEN}容器已停止。${NC}"
-    fi
-}
-
-stop_web() {
-    if [ "$(docker inspect -f '{{.State.Running}}' owl_web)" == "false" ]; then
-        echo -e "${YELLOW}容器已经停止。${NC}"
-    else
-        echo -e "${GREEN}停止 owl_web 容器...${NC}"
-        docker-compose stop owl_web
-        echo -e "${GREEN}容器已停止。${NC}"
-    fi
-}
-
-stop_mysql() {
-    if [ "$(docker inspect -f '{{.State.Running}}' mysql)" == "false" ]; then
-        echo -e "${YELLOW}容器已经停止。${NC}"
-    else
-        echo -e "${GREEN}停止 mysql 容器...${NC}"
-        docker-compose stop mysql
-        echo -e "${GREEN}容器已停止。${NC}"
-    fi
-}
-
-stop_nginx() {
-    if [ "$(docker inspect -f '{{.State.Running}}' nginx)" == "false" ]; then
-        echo -e "${YELLOW}容器已经停止。${NC}"
-    else
-        echo -e "${GREEN}停止 nginx 容器...${NC}"
-        docker-compose stop nginx
-        echo -e "${GREEN}容器已停止。${NC}"
-    fi
-}
-
-start_admin() {
-    if [ "$(docker inspect -f '{{.State.Running}}' owl_admin)" == "true" ]; then
-        echo -e "${YELLOW}容器已经启动。${NC}"
-    else
-        echo -e "${GREEN}启动 owl_admin 容器...${NC}"
-        docker-compose start owl_admin
-        echo -e "${GREEN}容器已启动。${NC}"
-    fi
-}
-
-start_web() {
-    if [ "$(docker inspect -f '{{.State.Running}}' owl_web)" == "true" ]; then
-        echo -e "${YELLOW}容器已经启动。${NC}"
-    else
-        echo -e "${GREEN}启动 owl_web 容器...${NC}"
-        docker-compose start owl_web
-        echo -e "${GREEN}容器已启动。${NC}"
-    fi
-}
-
-start_mysql() {
-    if [ "$(docker inspect -f '{{.State.Running}}' mysql)" == "true" ]; then
-        echo -e "${YELLOW}容器已经启动。${NC}"
-    else
-        echo -e "${GREEN}启动 mysql 容器...${NC}"
-        docker-compose start mysql
-        echo -e "${GREEN}容器已启动。${NC}"
-    fi
-}
-
-start_nginx() {
-    if [ "$(docker inspect -f '{{.State.Running}}' nginx)" == "true" ]; then
-        echo -e "${YELLOW}容器已经启动。${NC}"
-    else
-        echo -e "${GREEN}启动 nginx 容器...${NC}"
-        docker-compose start nginx
-        echo -e "${GREEN}容器已启动。${NC}"
-    fi
-}
-
-log_admin() {
-    echo -e "${GREEN}查看 owl_admin 容器日志...${NC}"
-    docker logs -f owl_admin
-}
-
-log_web() {
-    echo -e "${GREEN}查看 owl_web 容器日志...${NC}"
-    docker logs -f owl_web
-}
-
-log_mysql() {
-    echo -e "${GREEN}查看 mysql 容器日志...${NC}"
-    docker logs -f mysql
-}
-
-log_nginx() {
-    echo -e "${GREEN}查看 nginx 容器日志...${NC}"
-    docker logs -f nginx
+    case $action in
+        start)
+            if [ "$(docker inspect -f '{{.State.Running}}' ${service})" == "true" ]; then
+                echo -e "${YELLOW}${service} 容器已经启动。${NC}"
+            else
+                echo -e "${GREEN}启动 ${service} 容器...${NC}"
+                docker-compose start ${service}
+                echo -e "${GREEN}${service} 容器已启动。${NC}"
+            fi
+            ;;
+        stop)
+            if [ "$(docker inspect -f '{{.State.Running}}' ${service})" == "false" ]; then
+                echo -e "${YELLOW}${service} 容器已经停止。${NC}"
+            else
+                echo -e "${GREEN}停止 ${service} 容器...${NC}"
+                docker-compose stop ${service}
+                echo -e "${GREEN}${service} 容器已停止。${NC}"
+            fi
+            ;;
+        restart)
+            echo -e "${GREEN}重启 ${service} 容器...${NC}"
+            docker-compose restart ${service}
+            ;;
+        pull)
+            echo -e "${GREEN}拉取最新的 ${service} 镜像...${NC}"
+            docker-compose pull ${service}
+            docker-compose stop ${service}
+            docker-compose rm -f ${service}
+            docker-compose up -d ${service}
+            docker images -f "dangling=true" -q | xargs -r docker rmi
+            docker volume prune -f
+            docker logs -f ${service}
+            ;;
+        log)
+            echo -e "${GREEN}查看 ${service} 容器日志...${NC}"
+            docker logs -f ${service}
+            ;;
+        *)
+            echo -e "${RED}无效操作: ${action}${NC}"
+            ;;
+    esac
 }
 
 download_compose() {
@@ -269,7 +174,7 @@ install_and_start_all() {
     check_env || exit 1
     load_env
     
-    echo -e "${YELLOW}此选项将安装并启动nginx, owl_admin, owl_web${NC}"
+    echo -e "${YELLOW}此选项将安装并启动nginx，mysql，owl_admin, owl_web${NC}"
     read -p "是否继续？ (Y/N): " confirm
     if [ "$confirm" != "Y" ]; then
         echo -e "${YELLOW}安装已取消。${NC}"
@@ -283,9 +188,9 @@ install_and_start_all() {
         exit 1
     }
 
-    services=("admin" "web" "nginx")
+    services=("owl_admin" "owl_web" "nginx")
     for service in "${services[@]}"; do
-        start_${service}
+        manage_service start ${service}
     done
     
     echo -e "${GREEN}所有容器已启动。${NC}"
@@ -301,14 +206,14 @@ show_menu() {
     echo -e "${GREEN}  3.${NC} 一键安装并启动"
     echo -e ""
     echo -e "———————${GREEN}【admin】${NC}—————————"
-    echo -e "${GREEN}  4.${NC} 更新至admin最新版本"
+    echo -e "${GREEN}  4.${NC} 更新至最新版本"
     echo -e "${GREEN}  5.${NC} 启动 admin"
     echo -e "${GREEN}  6.${NC} 停止 admin"
     echo -e "${GREEN}  7.${NC} 重启 admin"
     echo -e "${GREEN}  8.${NC} 查看 admin 日志"
     echo -e ""
     echo -e "———————${GREEN}【web】${NC}—————————"
-    echo -e "${GREEN}  9.${NC} 更新至web最新版本"
+    echo -e "${GREEN}  9.${NC} 更新至最新版本"
     echo -e "${GREEN} 10.${NC} 启动 web"
     echo -e "${GREEN} 11.${NC} 停止 web"
     echo -e "${GREEN} 12.${NC} 重启 web"
@@ -345,58 +250,58 @@ while true; do
             install_and_start_all
             ;;
         4)
-            pull_admin
+            manage_service pull owl_admin
             ;;
         5)
-            start_admin
+            manage_service start owl_admin
             ;;
         6)
-            stop_admin
+            manage_service stop owl_admin
             ;;
         7)
-            restart_admin
+            manage_service restart owl_admin
             ;;
         8)
-            log_admin
+            manage_service log owl_admin
             ;;
         9)
-            pull_web
+            manage_service pull owl_web
             ;;
         10)
-            start_web
+            manage_service start owl_web
             ;;
         11)
-            stop_web
+            manage_service stop owl_web
             ;;
         12)
-            restart_web
+            manage_service restart owl_web
             ;;
         13)
-            log_web
+            manage_service log owl_web
             ;;
         14)
-            start_mysql
+            manage_service start mysql
             ;;
         15)
-            stop_mysql
+            manage_service stop mysql
             ;;
         16)
-            restart_mysql
+            manage_service restart mysql
             ;;
         17)
-            log_mysql
+            manage_service log mysql
             ;;
         18)
-            start_nginx
+            manage_service start nginx
             ;;
         19)
-            stop_nginx
+            manage_service stop nginx
             ;;
         20)
-            restart_nginx
+            manage_service restart nginx
             ;;
         21)
-            log_nginx
+            manage_service log nginx
             ;;
         0)
             echo "退出脚本。"
