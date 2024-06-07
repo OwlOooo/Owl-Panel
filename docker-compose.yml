@@ -21,7 +21,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       JDBC_TYPE: mysql
       JDBC_DRIVER: com.mysql.cj.jdbc.Driver
-      JDBC_URL: jdbc:mysql://mysql:${MYSQL_PORT}/${OWL_DATABASE}?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+      JDBC_URL: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${OWL_DATABASE}?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
       JDBC_USERNAME: root
       JDBC_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       JDBC_TEST_SQL: SELECT 1
