@@ -232,7 +232,7 @@ install_docker() {
         sudo systemctl enable docker
          echo -e "${YELLOW}Docker安装完毕。${NC}"
     else
-        
+         echo -e ""
     fi
 
     if ! command -v docker-compose &> /dev/null; then
@@ -250,7 +250,7 @@ install_docker() {
         sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
          echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
     else
-       
+        echo -e ""
     fi
 
   
