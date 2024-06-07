@@ -110,9 +110,9 @@ download_compose() {
     curl -o docker-compose.yml ${COMPOSE_URL}
     curl -o .env ${ENV_URL}
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}docker-compose.yml和env文件下载成功，请修改.env配置文件内的信息。${NC}"
+        echo -e "${GREEN}docker-compose.yml和.env文件下载成功，请修改.env配置文件内的信息。${NC}"
     else
-        echo -e "${RED}docker-compose.yml和env文件下载失败，请检查URL是否正确。${NC}"
+        echo -e "${RED}docker-compose.yml和.env文件下载失败，请检查URL是否正确。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     fi
@@ -127,7 +127,7 @@ install_mysql() {
     fi
     
     if [ ! -f .env ]; then
-        echo -e "${RED}未找到env文件，请先下载文件。${NC}"
+        echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     fi
@@ -166,7 +166,7 @@ install_mysql() {
 
 install_and_start_all() {
     if [ ! -f .env ]; then
-        echo -e "${RED}未找到env文件，请先下载文件。${NC}"
+        echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     fi
@@ -197,11 +197,68 @@ install_and_start_all() {
     read -p "按回车键返回菜单..."
 }
 
+install_docker() {
+    if [ ! -f docker-compose.yml ]; then
+        echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
+    fi
+    
+    if [ ! -f .env ]; then
+        echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
+    fi
+    
+    check_env || exit 1
+    
+    echo -e "${YELLOW}此选项将安装docker，docker-compose${NC}"
+
+    echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
+    if ! command -v docker &> /dev/null; then
+        echo -e "${GREEN}安装Docker...${NC}"
+        # 更新系统并安装必要的软件包
+        sudo yum update -y
+        sudo yum install -y yum-utils
+
+        # 设置Docker的仓库
+        sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+        # 安装最新版本的 Docker CE
+        sudo yum install -y docker-ce docker-ce-cli containerd.io
+
+        # 启动 Docker 并设置开机自启
+        sudo systemctl start docker
+        sudo systemctl enable docker
+    else
+        echo -e "${YELLOW}Docker已安装。${NC}"
+    fi
+
+    if ! command -v docker-compose &> /dev/null; then
+        echo -e "${GREEN}安装Docker Compose...${NC}"
+        # 获取最新版本的 Docker Compose
+        DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+
+        # 下载最新版本的 Docker Compose
+        sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+        # 赋予执行权限
+        sudo chmod +x /usr/local/bin/docker-compose
+
+        # 创建软链接（可选）
+        sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+    else
+        echo -e "${YELLOW}Docker Compose已安装。${NC}"
+    fi
+
+    read -p "按回车键返回菜单..."
+}
+
 # 显示菜单
 show_menu() {
     echo -e ""
     echo -e "———————${GREEN}【安装】${NC}—————————"
-    echo -e "${GREEN}  1.${NC} 下载 docker-compose.yml 和 env 文件"
+    echo -e "${GREEN}  1.${NC} 下载 docker-compose.yml 和 .env 文件"
     echo -e "${GREEN}  2.${NC} 安装 MySQL"
     echo -e "${GREEN}  3.${NC} 一键安装并启动"
     echo -e ""
@@ -244,9 +301,11 @@ while true; do
             download_compose
             ;;
         2)
+            install_docker
             install_mysql
             ;;
         3)
+            install_docker
             install_and_start_all
             ;;
         4)
