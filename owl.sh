@@ -214,7 +214,7 @@ download_compose() {
     read -p "按回车键返回菜单..."
 }
 
-install_all() {
+install_mysql() {
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
@@ -229,56 +229,12 @@ install_all() {
     
     check_env || exit 1
     
-    echo -e "${YELLOW}此选项将安装docker，docker-compose，nginx，mysql，owl_admin, owl_web${NC}"
+    echo -e "${YELLOW}此选项将安装MySQL${NC}"
     read -p "是否继续？ (Y/N): " confirm
     if [ "$confirm" != "Y" ]; then
         echo -e "${YELLOW}安装已取消。${NC}"
         read -p "按回车键返回菜单..."
         return
-    fi
-
-    echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
-    if ! command -v docker &> /dev/null; then
-        echo -e "${GREEN}安装Docker...${NC}"
-        # 更新系统并安装必要的软件包
-        sudo yum update -y
-        sudo yum install -y yum-utils
-
-        # 设置Docker的仓库
-        sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-
-        # 安装最新版本的 Docker CE
-        sudo yum install -y docker-ce docker-ce-cli containerd.io
-
-        # 启动 Docker 并设置开机自启
-        sudo systemctl start docker
-        sudo systemctl enable docker
-    else
-        echo -e "${YELLOW}Docker已安装。${NC}"
-    fi
-
-    if ! command -v docker-compose &> /dev/null; then
-        echo -e "${GREEN}安装Docker Compose...${NC}"
-        # 获取最新版本的 Docker Compose
-        DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
-
-        # 下载最新版本的 Docker Compose
-        sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-        # 赋予执行权限
-        sudo chmod +x /usr/local/bin/docker-compose
-
-        # 创建软链接（可选）
-        sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-    else
-        echo -e "${YELLOW}Docker Compose已安装。${NC}"
-    fi
-
-    echo -e "${GREEN}检测docker-compose.yml中的项目状态...${NC}"
-    if [ "$(docker ps -a --filter "name=mysql" --format '{{.Names}}')" == "mysql" ]; then
-        echo -e "${RED}MySQL 容器已存在，请手动停止并删除后再使用一键安装。${NC}"
-        read -p "按回车键返回菜单..."
-        exit 1
     fi
 
     load_env
@@ -300,20 +256,10 @@ install_all() {
     }
 
     echo -e "${GREEN}MySQL 容器安装并启动成功。${NC}"
-
-    echo -e "${GREEN}开始安装剩余的容器...${NC}"
-    docker-compose up -d nginx owl_admin owl_web
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}安装过程中发生错误，请检查docker-compose.yml文件是否正确。${NC}"
-        read -p "按回车键返回菜单..."
-        exit 1
-    fi
-    
-    echo -e "${GREEN}一键安装完成。${NC}"
     read -p "按回车键返回菜单..."
 }
 
-start_all() {
+install_and_start_all() {
     if [ ! -f .env ]; then
         echo -e "${RED}未找到env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
@@ -323,34 +269,23 @@ start_all() {
     check_env || exit 1
     load_env
     
-    echo -e "${YELLOW}此选项将启动nginx，mysql，owl_admin, owl_web${NC}"
+    echo -e "${YELLOW}此选项将安装并启动nginx，mysql，owl_admin, owl_web${NC}"
     read -p "是否继续？ (Y/N): " confirm
     if [ "$confirm" != "Y" ]; then
-        echo -e "${YELLOW}启动已取消。${NC}"
+        echo -e "${YELLOW}安装已取消。${NC}"
         read -p "按回车键返回菜单..."
         return
     fi
 
-    if [ "$(docker inspect -f '{{.State.Running}}' mysql)" == "false" ]; then
-        start_mysql
-        sleep 10 # 等待 MySQL 容器完全启动
+    check_mysql_port || {
+        echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
+    }
 
-        check_mysql_port || {
-            echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
-            read -p "按回车键返回菜单..."
-            exit 1
-        }
-    else
-        echo -e "${YELLOW}MySQL 容器已经启动。${NC}"
-    fi
-
-    services=("nginx" "owl_admin" "owl_web")
+    services=("owl_admin" "owl_web" "nginx")
     for service in "${services[@]}"; do
-        if [ "$(docker inspect -f '{{.State.Running}}' $service)" == "false" ]; then
-            start_${service}
-        else
-            echo -e "${YELLOW}$service 容器已经启动。${NC}"
-        fi
+        start_${service}
     done
     
     echo -e "${GREEN}所有容器已启动。${NC}"
@@ -362,8 +297,8 @@ show_menu() {
     echo -e ""
     echo -e "———————${GREEN}【安装】${NC}—————————"
     echo -e "${GREEN}  1.${NC} 下载 docker-compose.yml 和 env 文件"
-    echo -e "${GREEN}  2.${NC} 一键安装"
-    echo -e "${GREEN}  3.${NC} 一键启动"
+    echo -e "${GREEN}  2.${NC} 安装 MySQL"
+    echo -e "${GREEN}  3.${NC} 一键安装并启动"
     echo -e ""
     echo -e "———————${GREEN}【admin】${NC}—————————"
     echo -e "${GREEN}  4.${NC} 更新至admin最新版本"
@@ -373,7 +308,7 @@ show_menu() {
     echo -e "${GREEN}  8.${NC} 查看 admin 日志"
     echo -e ""
     echo -e "———————${GREEN}【web】${NC}—————————"
-    echo- e "${GREEN}  9.${NC} 更新至web最新版本"
+    echo -e "${GREEN}  9.${NC} 更新至web最新版本"
     echo -e "${GREEN} 10.${NC} 启动 web"
     echo -e "${GREEN} 11.${NC} 停止 web"
     echo -e "${GREEN} 12.${NC} 重启 web"
@@ -387,7 +322,7 @@ show_menu() {
     echo -e ""
     echo -e "———————${GREEN}【nginx】${NC}—————————"
     echo -e "${GREEN} 18.${NC} 启动 nginx"
-    echo --e "${GREEN} 19.${NC} 停止 nginx"
+    echo -e "${GREEN} 19.${NC} 停止 nginx"
     echo -e "${GREEN} 20.${NC} 重启 nginx"
     echo -e "${GREEN} 21.${NC} 查看 nginx 日志"
     echo -e "———————————————————"
@@ -404,10 +339,10 @@ while true; do
             download_compose
             ;;
         2)
-            install_all
+            install_mysql
             ;;
         3)
-            start_all
+            install_and_start_all
             ;;
         4)
             pull_admin
