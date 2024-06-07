@@ -288,11 +288,7 @@ install_all() {
         exit 1
     fi
 
-    check_ports "$ADMIN_PORT" "$WEB_PORT"
-    if [ $? -ne 0 ]; then
-        read -p "按回车键返回菜单..."
-        exit 1
-    fi
+  
     
     echo -e "${GREEN}一键安装完成。${NC}"
     read -p "按回车键返回菜单..."
@@ -325,7 +321,7 @@ start_all() {
         fi
     done
 
-    check_ports "$ADMIN_PORT" "$WEB_PORT"
+    check_ports "$" "$WEB_PORT"
     if [ $? -ne 0 ]; then
         read -p "按回车键返回菜单..."
         exit 1
