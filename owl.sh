@@ -269,7 +269,7 @@ install_and_start_all() {
     check_env || exit 1
     load_env
     
-    echo -e "${YELLOW}此选项将安装并启动nginx，mysql，owl_admin, owl_web${NC}"
+    echo -e "${YELLOW}此选项将安装并启动nginx,owl_admin, owl_web${NC}"
     read -p "是否继续？ (Y/N): " confirm
     if [ "$confirm" != "Y" ]; then
         echo -e "${YELLOW}安装已取消。${NC}"
