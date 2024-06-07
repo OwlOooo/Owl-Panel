@@ -59,3 +59,13 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
  #### 安装MySQL
 
 - 在菜单中选择序号 `2` 安装MySQL，安装完后切记打开MySQL端口号。
+
+ #### 一键部署系统
+
+- 在菜单中选择序号 `3` 一键安装并启动，会安装`owl_admin` `owl_web` `Nginx Proxy Manager`。
+
+ ```markdown
+    owl_admin是面板后端服务,端口默认为8989
+    owl_web是面板客户端服务,端口默认为8281
+    Nginx Proxy Manager是反向代理可视化工具，默认端口为81
+  
