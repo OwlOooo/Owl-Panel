@@ -66,7 +66,7 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 
 `owl_web`是面板客户端服务,端口默认为`8281`
 
-`Nginx Proxy Manager`是反向代理可视化工具，默认端口为`81`
+`Nginx Proxy Manager`是反向代理可视化工具，默认端口为`81`,默认账号密码为`admin@example.com`和`changeme`
 
 ---
 
