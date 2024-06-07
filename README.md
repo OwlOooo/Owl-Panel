@@ -85,6 +85,10 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 ![image](https://github.com/OwlOooo/Owl-Panel/assets/171789662/0c78c8eb-46e0-4919-99bc-210b3551c288)
 
 
+
+
+
+
 #### 版本对比说明
 
 | 功能                | 社区版           | VIP版          |
@@ -100,4 +104,4 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 
 #### 联系方式
 
-Tg：https://t.me/+BRD15JUPyhxhZDFh
+Tg：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
