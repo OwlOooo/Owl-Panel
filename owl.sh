@@ -35,6 +35,11 @@ check_ports() {
             return 1
         fi
     done
+    return 0
+}
+
+# 检测 MySQL 端口
+check_mysql_port() {
     if ! nc -zv "${MYSQL_HOST}" "${MYSQL_PORT}" &>/dev/null; then
         echo -e "${RED}MySQL 地址 ${MYSQL_HOST}:${MYSQL_PORT} 未开放，请先开放端口。${NC}"
         return 1
@@ -288,7 +293,12 @@ install_all() {
         exit 1
     fi
 
-  
+    start_mysql
+    check_mysql_port || {
+        echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
+    }
     
     echo -e "${GREEN}一键安装完成。${NC}"
     read -p "按回车键返回菜单..."
@@ -321,11 +331,11 @@ start_all() {
         fi
     done
 
-    check_ports "$" "$WEB_PORT"
-    if [ $? -ne 0 ]; then
+    check_mysql_port || {
+        echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
-    fi
+    }
     
     echo -e "${GREEN}所有容器已启动。${NC}"
     read -p "按回车键返回菜单..."
