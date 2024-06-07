@@ -1,0 +1,68 @@
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: nginx
+      MYSQL_USER: nginx
+      MYSQL_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+	
+	
+  owl_admin:
+    container_name: owl_admin
+    image: owloooo/owl_admin:1.0 
+    ports:
+      - "8989:8989"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JDBC_TYPE: mysql
+      JDBC_DRIVER: com.mysql.cj.jdbc.Driver
+      JDBC_URL: jdbc:mysql://mysql:3306/owl_databse?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+      JDBC_USERNAME: root
+      JDBC_PASSWORD: 123456
+      JDBC_TEST_SQL: SELECT 1
+    depends_on:
+      - mysql
+    restart: always
+
+  owl_web:
+    container_name: owl_web
+    image: owloooo/owl_web:1.0  
+    environment:
+      - DOMAIN=http://47.238.246.202:8989/api
+    ports:
+      - "8281:80"
+    depends_on:
+      - owl_admin
+    restart: always
+
+
+  nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx
+    ports:
+      - '80:80'        # HTTP
+      - '81:81'        # Nginx Proxy Manager admin
+      - '443:443'      # HTTPS
+    environment:
+      DB_MYSQL_HOST: "mysql"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "root"
+      DB_MYSQL_PASSWORD: "123456"
+      DB_MYSQL_NAME: "nginx"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    depends_on:
+      - mysql
+    restart: always
+
+volumes:
+  mysql_data:
