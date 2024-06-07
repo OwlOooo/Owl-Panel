@@ -283,7 +283,7 @@ install_and_start_all() {
         exit 1
     }
 
-    services=("owl_admin" "owl_web" "nginx")
+    services=("admin" "web" "nginx")
     for service in "${services[@]}"; do
         start_${service}
     done
