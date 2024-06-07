@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# 下载脚本
-curl -o /usr/local/bin/owl https://raw.githubusercontent.com/OwlOooo/owl-panel/main/owl.sh
+# 强制获取最新的脚本
+echo -e "${GREEN}获取最新的Owl脚本...${NC}"
+if [ -f /usr/local/bin/owl ]; then
+    sudo rm /usr/local/bin/owl
+fi
+sudo curl -o /usr/local/bin/owl https://raw.githubusercontent.com/OwlOooo/owl-panel/main/owl.sh
+
+
 
 # 检查下载是否成功
 if [ $? -ne 0 ]; then
