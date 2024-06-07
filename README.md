@@ -79,8 +79,11 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 #### 3X-UI设置
 
 - 一定要按照下图所示进行更改，其中面板设置->常规-面板 url 根路径 和 面板设置->订阅设置->URI 路径可自定义，会在猫头鹰面板上添加服务器时用到。
+  
 ![image](https://github.com/OwlOooo/Owl-Panel/assets/171789662/008051cd-97f1-4b34-a60d-4bdf2e78f89e)
+
 ![image](https://github.com/OwlOooo/Owl-Panel/assets/171789662/0c78c8eb-46e0-4919-99bc-210b3551c288)
+
 
 #### 版本对比说明
 
@@ -93,3 +96,8 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 | 自定义站点名称      | 不可以           | 可以            |
 | 技术支持            | 无               | 7*24小时        |
 | 价格            | 免费               | 联系客服咨询 |
+
+
+#### 联系方式
+
+Tg：https://t.me/+BRD15JUPyhxhZDFh
