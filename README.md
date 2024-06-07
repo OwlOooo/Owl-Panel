@@ -26,33 +26,33 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 
 
   ```markdown
-  #服务器IP，换成自己的服务器IP或者域名，如果加了SSL，改成https
+  - 服务器IP，换成自己的服务器IP或者域名，如果加了SSL，改成https
 SERVER_IP=127.0.0.1
 
-#mysql 换成mysql的地址
+ - mysql 换成mysql的地址
 MYSQL_HOST=127.0.0.1
 
-#mysql用户名
+ - mysql用户名
 MYSQL_USERNAME=root
 
-#mysql端口,记得开放端口
+ - mysql端口,记得开放端口
 MYSQL_PORT=8206
 
-#mysql密码，请修改为复杂的密码
+ - mysql密码，请修改为复杂的密码
 MYSQL_ROOT_PASSWORD=123456
 
-#mysql初始化数据库
+ - mysql初始化数据库
 MYSQL_DATABASE=nginx
 
-#owl数据库
+ - owl数据库
 OWL_DATABASE=owl_database
 
-#owl后台管理端口
+ - owl后台管理端口
 ADMIN_PORT=8989
 
-#owl客户端面板端口
+ - owl客户端面板端口
 WEB_PORT=8281
 
-#owl后台管理api地址
+ - owl后台管理api地址
 DOMAIN=http://${SERVER_IP}:${ADMIN_PORT}/api
   
