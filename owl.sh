@@ -203,6 +203,8 @@ download_compose() {
         echo -e "${GREEN}docker-compose.yml和env文件下载成功，请修改.env配置文件内的信息。${NC}"
     else
         echo -e "${RED}docker-compose.yml和env文件下载失败，请检查URL是否正确。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
     fi
     read -p "按回车键返回菜单..."
 }
@@ -211,16 +213,16 @@ install_all() {
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        return
+        exit 1
     fi
     
     if [ ! -f .env ]; then
         echo -e "${RED}未找到env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        return
+        exit 1
     fi
     
-    check_env || return
+    check_env || exit 1
     
     echo -e "${YELLOW}此选项将安装docker，docker-compose，nginx，mysql，owl_admin, owl_web${NC}"
     read -p "是否继续？ (Y/N): " confirm
@@ -273,20 +275,25 @@ install_all() {
         if [ "$(docker ps -a --filter "name=$service" --format '{{.Names}}')" == "$service" ]; then
             echo -e "${RED}服务 $service 已经存在，请先手动停止并删除容器后再使用一键安装。${NC}"
             read -p "按回车键返回菜单..."
-            return
+            exit 1
         fi
     done
 
     load_env
-    check_ports "$MYSQL_PORT" "$ADMIN_PORT" "$WEB_PORT" || return
-
     echo -e "${GREEN}开始一键安装...${NC}"
     docker-compose up -d
     if [ $? -ne 0 ]; then
         echo -e "${RED}一键安装过程中发生错误，请检查docker-compose.yml文件是否正确。${NC}"
         read -p "按回车键返回菜单..."
-        return
+        exit 1
     fi
+
+    check_ports "$ADMIN_PORT" "$WEB_PORT"
+    if [ $? -ne 0 ]; then
+        read -p "按回车键返回菜单..."
+        exit 1
+    fi
+    
     echo -e "${GREEN}一键安装完成。${NC}"
     read -p "按回车键返回菜单..."
 }
@@ -295,12 +302,11 @@ start_all() {
     if [ ! -f .env ]; then
         echo -e "${RED}未找到env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        return
+        exit 1
     fi
     
-    check_env || return
+    check_env || exit 1
     load_env
-    check_ports "$MYSQL_PORT" "$ADMIN_PORT" "$WEB_PORT" || return
     
     echo -e "${YELLOW}此选项将启动nginx，mysql，owl_admin, owl_web${NC}"
     read -p "是否继续？ (Y/N): " confirm
@@ -312,8 +318,18 @@ start_all() {
 
     services=("nginx" "mysql" "owl_admin" "owl_web")
     for service in "${services[@]}"; do
-        start_${service}
+        if [ "$(docker inspect -f '{{.State.Running}}' $service)" == "false" ]; then
+            start_${service}
+        else
+            echo -e "${YELLOW}$service 容器已经启动。${NC}"
+        fi
     done
+
+    check_ports "$ADMIN_PORT" "$WEB_PORT"
+    if [ $? -ne 0 ]; then
+        read -p "按回车键返回菜单..."
+        exit 1
+    fi
     
     echo -e "${GREEN}所有容器已启动。${NC}"
     read -p "按回车键返回菜单..."
