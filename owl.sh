@@ -220,7 +220,7 @@ install_docker() {
         # 更新系统并安装必要的软件包
         sudo yum update -y
         sudo yum install -y yum-utils
-
+        sudo yum -y install nc
         # 设置Docker的仓库
         sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
