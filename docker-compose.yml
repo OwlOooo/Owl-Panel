@@ -48,7 +48,7 @@ services:
       - '81:81'        # Nginx Proxy Manager admin
       - '443:443'      # HTTPS
     environment:
-      DB_MYSQL_HOST: "mysql"
+      DB_MYSQL_HOST: ${MYSQL_HOST}
       DB_MYSQL_PORT: ${MYSQL_PORT}
       DB_MYSQL_USER: root
       DB_MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
