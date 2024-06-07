@@ -13,6 +13,45 @@ StartTitle() {
     echo -e '  \033[0;1;36;96m欢迎使用猫头鹰订阅管理面板一键脚本\033[0m'
 }
 
+# 读取 .env 文件
+load_env() {
+    if [ ! -f .env ]; then
+        echo -e "${RED}.env 文件不存在，请先下载 .env 文件。${NC}"
+        return 1
+    fi
+    export $(grep -v '^#' .env | xargs)
+}
+
+# 端口检测函数
+check_ports() {
+    local ports=("$@")
+    if ! command -v nc &> /dev/null; then
+        echo -e "${GREEN}安装 nc...${NC}"
+        sudo yum -y install nc
+    fi
+    for port in "${ports[@]}"; do
+        if ! nc -zv "${SERVER_IP}" "$port" &>/dev/null; then
+            echo -e "${RED}端口 $port 未开放，请先开放端口。${NC}"
+            return 1
+        fi
+    done
+    if ! nc -zv "${MYSQL_HOST}" "${MYSQL_PORT}" &>/dev/null; then
+        echo -e "${RED}MySQL 地址 ${MYSQL_HOST}:${MYSQL_PORT} 未开放，请先开放端口。${NC}"
+        return 1
+    fi
+    return 0
+}
+
+# .env 文件检查函数
+check_env() {
+    if grep -q "127.0.0.1" .env; then
+        echo -e "${RED}检测到 .env 文件中的 MYSQL_HOST 或 DOMAIN 包含 127.0.0.1，请先修改为正确的 IP 地址。${NC}"
+        read -p "按回车键返回菜单..."
+        return 1
+    fi
+    return 0
+}
+
 # 函数定义
 pull_admin() {
     echo -e "${GREEN}拉取最新的 owl_admin 镜像...${NC}"
@@ -181,6 +220,8 @@ install_all() {
         return
     fi
     
+    check_env || return
+    
     echo -e "${YELLOW}此选项将安装docker，docker-compose，nginx，mysql，owl_admin, owl_web${NC}"
     read -p "是否继续？ (Y/N): " confirm
     if [ "$confirm" != "Y" ]; then
@@ -236,6 +277,9 @@ install_all() {
         fi
     done
 
+    load_env
+    check_ports "$MYSQL_PORT" "$ADMIN_PORT" "$WEB_PORT" || return
+
     echo -e "${GREEN}开始一键安装...${NC}"
     docker-compose up -d
     if [ $? -ne 0 ]; then
@@ -247,39 +291,67 @@ install_all() {
     read -p "按回车键返回菜单..."
 }
 
+start_all() {
+    if [ ! -f .env ]; then
+        echo -e "${RED}未找到env文件，请先下载文件。${NC}"
+        read -p "按回车键返回菜单..."
+        return
+    fi
+    
+    check_env || return
+    load_env
+    check_ports "$MYSQL_PORT" "$ADMIN_PORT" "$WEB_PORT" || return
+    
+    echo -e "${YELLOW}此选项将启动nginx，mysql，owl_admin, owl_web${NC}"
+    read -p "是否继续？ (Y/N): " confirm
+    if [ "$confirm" != "Y" ]; then
+        echo -e "${YELLOW}启动已取消。${NC}"
+        read -p "按回车键返回菜单..."
+        return
+    fi
+
+    services=("nginx" "mysql" "owl_admin" "owl_web")
+    for service in "${services[@]}"; do
+        start_${service}
+    done
+    
+    echo -e "${GREEN}所有容器已启动。${NC}"
+    read -p "按回车键返回菜单..."
+}
+
 # 显示菜单
 show_menu() {
     echo -e ""
     echo -e "———————${GREEN}【安装】${NC}—————————"
     echo -e "${GREEN}  1.${NC} 下载 docker-compose.yml 和 env 文件"
     echo -e "${GREEN}  2.${NC} 一键安装"
-     echo -e ""
+    echo -e "${GREEN}  3.${NC} 一键启动"
+    echo -e ""
     echo -e "———————${GREEN}【admin】${NC}—————————"
-    echo -e "${GREEN}  3.${NC} 更新至admin最新版本"
-    echo -e "${GREEN}  4.${NC} 启动 admin"
-    echo -e "${GREEN}  5.${NC} 停止 admin"
-    echo -e "${GREEN}  6.${NC} 重启 admin"
-    echo -e "${GREEN}  7.${NC} 查看 admin 日志"
-     echo -e ""
+    echo -e "${GREEN}  4.${NC} 更新至admin最新版本"
+    echo -e "${GREEN}  5.${NC} 启动 admin"
+    echo -e "${GREEN}  6.${NC} 停止 admin"
+    echo -e "${GREEN}  7.${NC} 重启 admin"
+    echo -e "${GREEN}  8.${NC} 查看 admin 日志"
+    echo -e ""
     echo -e "———————${GREEN}【web】${NC}—————————"
-    echo -e "${GREEN}  8.${NC} 更新至web最新版本"
-    echo -e "${GREEN}  9.${NC} 启动 web"
-    echo -e "${GREEN} 10.${NC} 停止 web"
-    echo -e "${GREEN} 11.${NC} 重启 web"
-    echo -e "${GREEN} 12.${NC} 查看 web 日志"
-     echo -e ""
+    echo -e "${GREEN}  9.${NC} 更新至web最新版本"
+    echo -e "${GREEN} 10.${NC} 启动 web"
+    echo -e "${GREEN} 11.${NC} 停止 web"
+    echo -e "${GREEN} 12.${NC} 重启 web"
+    echo -e "${GREEN} 13.${NC} 查看 web 日志"
+    echo -e ""
     echo -e "———————${GREEN}【mysql】${NC}—————————"
-    echo -e "${GREEN} 13.${NC} 启动 mysql"
-    echo -e "${GREEN} 14.${NC} 停止 mysql"
-    echo -e "${GREEN} 15.${NC} 重启 mysql"
-    echo -e "${GREEN} 16.${NC} 查看 mysql 日志"
-     echo -e ""
+    echo -e "${GREEN} 14.${NC} 启动 mysql"
+    echo -e "${GREEN} 15.${NC} 停止 mysql"
+    echo -e "${GREEN} 16.${NC} 重启 mysql"
+    echo -e "${GREEN} 17.${NC} 查看 mysql 日志"
+    echo -e ""
     echo -e "———————${GREEN}【nginx】${NC}—————————"
-    echo -e "${GREEN} 17.${NC} 启动 nginx"
-    echo -e "${GREEN} 18.${NC} 停止 nginx"
-    echo -e "${GREEN} 19.${NC} 重启 nginx"
-    echo -e "${GREEN} 20.${NC} 查看 nginx 日志"
-   
+    echo -e "${GREEN} 18.${NC} 启动 nginx"
+    echo -e "${GREEN} 19.${NC} 停止 nginx"
+    echo -e "${GREEN} 20.${NC} 重启 nginx"
+    echo -e "${GREEN} 21.${NC} 查看 nginx 日志"
     echo -e "———————————————————"
     echo -e "${GREEN}  0.${YELLOW} 退出${NC}"
 }
@@ -288,7 +360,7 @@ show_menu() {
 while true; do
     StartTitle
     show_menu
-    read -p "输入选项 [0-20]: " choice
+    read -p "输入选项 [0-21]: " choice
     case "$choice" in
         1)
             download_compose
@@ -297,57 +369,60 @@ while true; do
             install_all
             ;;
         3)
-            pull_admin
+            start_all
             ;;
         4)
-            start_admin
+            pull_admin
             ;;
         5)
-            stop_admin
+            start_admin
             ;;
         6)
-            restart_admin
+            stop_admin
             ;;
         7)
-            log_admin
+            restart_admin
             ;;
         8)
-            pull_web
+            log_admin
             ;;
         9)
-            start_web
+            pull_web
             ;;
         10)
-            stop_web
+            start_web
             ;;
         11)
-            restart_web
+            stop_web
             ;;
         12)
-            log_web
+            restart_web
             ;;
         13)
-            start_mysql
+            log_web
             ;;
         14)
-            stop_mysql
+            start_mysql
             ;;
         15)
-            restart_mysql
+            stop_mysql
             ;;
         16)
-            log_mysql
+            restart_mysql
             ;;
         17)
-            start_nginx
+            log_mysql
             ;;
         18)
-            stop_nginx
+            start_nginx
             ;;
         19)
-            restart_nginx
+            stop_nginx
             ;;
         20)
+            restart_nginx
+            ;;
+        21)
             log_nginx
             ;;
         0)
