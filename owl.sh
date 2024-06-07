@@ -275,30 +275,39 @@ install_all() {
     fi
 
     echo -e "${GREEN}检测docker-compose.yml中的项目状态...${NC}"
-    services=("nginx" "mysql" "owl_admin" "owl_web")
-    for service in "${services[@]}"; do
-        if [ "$(docker ps -a --filter "name=$service" --format '{{.Names}}')" == "$service" ]; then
-            echo -e "${RED}服务 $service 已经存在，请先手动停止并删除容器后再使用一键安装。${NC}"
-            read -p "按回车键返回菜单..."
-            exit 1
-        fi
-    done
-
-    load_env
-    echo -e "${GREEN}开始一键安装...${NC}"
-    docker-compose up -d
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}一键安装过程中发生错误，请检查docker-compose.yml文件是否正确。${NC}"
+    if [ "$(docker ps -a --filter "name=mysql" --format '{{.Names}}')" == "mysql" ]; then
+        echo -e "${RED}MySQL 容器已存在，请手动停止并删除后再使用一键安装。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     fi
 
-    start_mysql
+    load_env
+
+    echo -e "${GREEN}开始安装 MySQL 容器...${NC}"
+    docker-compose up -d mysql
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}MySQL 容器安装过程中发生错误，请检查docker-compose.yml文件是否正确。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
+    fi
+
+    sleep 10 # 等待 MySQL 容器完全启动
+
     check_mysql_port || {
         echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     }
+
+    echo -e "${GREEN}MySQL 容器安装并启动成功。${NC}"
+
+    echo -e "${GREEN}开始安装剩余的容器...${NC}"
+    docker-compose up -d nginx owl_admin owl_web
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}安装过程中发生错误，请检查docker-compose.yml文件是否正确。${NC}"
+        read -p "按回车键返回菜单..."
+        exit 1
+    fi
     
     echo -e "${GREEN}一键安装完成。${NC}"
     read -p "按回车键返回菜单..."
@@ -322,7 +331,20 @@ start_all() {
         return
     fi
 
-    services=("nginx" "mysql" "owl_admin" "owl_web")
+    if [ "$(docker inspect -f '{{.State.Running}}' mysql)" == "false" ]; then
+        start_mysql
+        sleep 10 # 等待 MySQL 容器完全启动
+
+        check_mysql_port || {
+            echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
+            read -p "按回车键返回菜单..."
+            exit 1
+        }
+    else
+        echo -e "${YELLOW}MySQL 容器已经启动。${NC}"
+    fi
+
+    services=("nginx" "owl_admin" "owl_web")
     for service in "${services[@]}"; do
         if [ "$(docker inspect -f '{{.State.Running}}' $service)" == "false" ]; then
             start_${service}
@@ -330,12 +352,6 @@ start_all() {
             echo -e "${YELLOW}$service 容器已经启动。${NC}"
         fi
     done
-
-    check_mysql_port || {
-        echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
-        read -p "按回车键返回菜单..."
-        exit 1
-    }
     
     echo -e "${GREEN}所有容器已启动。${NC}"
     read -p "按回车键返回菜单..."
@@ -357,7 +373,7 @@ show_menu() {
     echo -e "${GREEN}  8.${NC} 查看 admin 日志"
     echo -e ""
     echo -e "———————${GREEN}【web】${NC}—————————"
-    echo -e "${GREEN}  9.${NC} 更新至web最新版本"
+    echo- e "${GREEN}  9.${NC} 更新至web最新版本"
     echo -e "${GREEN} 10.${NC} 启动 web"
     echo -e "${GREEN} 11.${NC} 停止 web"
     echo -e "${GREEN} 12.${NC} 重启 web"
@@ -371,7 +387,7 @@ show_menu() {
     echo -e ""
     echo -e "———————${GREEN}【nginx】${NC}—————————"
     echo -e "${GREEN} 18.${NC} 启动 nginx"
-    echo -e "${GREEN} 19.${NC} 停止 nginx"
+    echo --e "${GREEN} 19.${NC} 停止 nginx"
     echo -e "${GREEN} 20.${NC} 重启 nginx"
     echo -e "${GREEN} 21.${NC} 查看 nginx 日志"
     echo -e "———————————————————"
