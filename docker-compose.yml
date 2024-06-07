@@ -33,7 +33,7 @@ services:
     container_name: owl_web
     image: owloooo/owl_web:1.0  
     environment:
-      - DOMAIN=${DOMAIN}
+      - DOMAIN=${API_URL}
     ports:
       - "${WEB_PORT}:80"
     depends_on:
