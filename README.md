@@ -68,7 +68,7 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 
 - 在菜单中选择序号 `3` 一键安装并启动，会安装`owl_admin` `owl_web` `Nginx Proxy Manager`。
 
-`owl_admin`是面板后端服务,端口默认为`8989`
+`owl_admin`是面板后端服务,端口默认为`8989`,,默认账号密码为`admin`和`admin`
 
 `owl_web`是面板客户端服务,端口默认为`8281`
 
