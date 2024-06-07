@@ -28,8 +28,10 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
   ```markdown
   - 服务器IP，换成自己的服务器IP或者域名，如果加了SSL，改成https
    SERVER_IP=127.0.0.1
+
    mysql 换成mysql的地址
    MYSQL_HOST=127.0.0.1
+
    mysql用户名
    MYSQL_USERNAME=root
 
