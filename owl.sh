@@ -214,44 +214,51 @@ install_docker() {
     
     echo -e "${YELLOW}此选项将安装docker，docker-compose${NC}"
 
-    echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
-    if ! command -v docker &> /dev/null; then
-        echo -e "${GREEN}安装Docker...${NC}"
-        # 更新系统并安装必要的软件包
-        sudo yum update -y
-        sudo yum install -y yum-utils
-        sudo yum -y install nc
-        # 设置Docker的仓库
-        sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+   #!/bin/bash
 
-        # 安装最新版本的 Docker CE
-        sudo yum install -y docker-ce docker-ce-cli containerd.io
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
 
-        # 启动 Docker 并设置开机自启
-        sudo systemctl start docker
-        sudo systemctl enable docker
-         echo -e "${YELLOW}Docker安装完毕。${NC}"
-    else
-         echo -e ""
-    fi
+echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
+if ! command -v docker &> /dev/null; then
+    echo -e "${GREEN}安装Docker...${NC}"
+    # 更新系统并安装必要的软件包
+    sudo yum update -y
+    sudo yum install -y yum-utils
+    sudo yum -y install nc
+    # 设置Docker的仓库
+    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-    if ! command -v docker-compose &> /dev/null; then
-        echo -e "${GREEN}安装Docker Compose...${NC}"
-        # 获取最新版本的 Docker Compose
-        DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+    # 安装最新版本的 Docker CE
+    sudo yum install -y docker-ce docker-ce-cli containerd.io
 
-        # 下载最新版本的 Docker Compose
-        sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    # 启动 Docker 并设置开机自启
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    echo -e "${YELLOW}Docker安装完毕。${NC}"
+else
+    echo -e " "
+fi
 
-        # 赋予执行权限
-        sudo chmod +x /usr/local/bin/docker-compose
+if ! command -v docker-compose &> /dev/null; then
+    echo -e "${GREEN}安装Docker Compose...${NC}"
+    # 获取最新版本的 Docker Compose
+    DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
 
-        # 创建软链接（可选）
-        sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-         echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
-    else
-        echo -e ""
-    fi
+    # 下载最新版本的 Docker Compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+    # 赋予执行权限
+    sudo chmod +x /usr/local/bin/docker-compose
+
+    # 创建软链接（可选）
+    sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+    echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
+else
+    echo -e " "
+fi
+
 
   
 }
