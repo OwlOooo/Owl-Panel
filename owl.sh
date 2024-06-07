@@ -230,8 +230,9 @@ install_docker() {
         # 启动 Docker 并设置开机自启
         sudo systemctl start docker
         sudo systemctl enable docker
+         echo -e "${YELLOW}Docker安装完毕。${NC}"
     else
-        echo -e "${YELLOW}Docker已安装。${NC}"
+        
     fi
 
     if ! command -v docker-compose &> /dev/null; then
@@ -247,8 +248,9 @@ install_docker() {
 
         # 创建软链接（可选）
         sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+         echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
     else
-        echo -e "${YELLOW}Docker Compose已安装。${NC}"
+       
     fi
 
   
