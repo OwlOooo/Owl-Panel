@@ -2,12 +2,23 @@
 
 **猫头鹰订阅管理面板**
 
-Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅各种资源。
+Owl-Panel 是一个用于管理代理节点的面板，让您轻松地管理和订阅各种节点。
 
 
 #### 联系方式
 
 TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
+
+
+#### 支持系统
+
+- **Centos 7.6+**
+- **Debian 11+**
+- **内存至少2G**
+  
+#### 3X-UI
+
+- **版本 v2.2.7+**
 
 #### 安装步骤
 
@@ -15,15 +26,6 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
    ```bash
    curl -sSL https://raw.githubusercontent.com/OwlOooo/owl-panel/main/install.sh -o install.sh && sh install.sh
-
-#### 支持系统
-
-- **Centos 7.6+**
-- **内存至少2G**
-  
-#### 3X-UI
-
-- **版本 v2.2.7+**
 
 
 #### 使用说明
