@@ -7,7 +7,7 @@ Owl-Panel 是一个用于管理订阅的面板，让您轻松地管理和订阅�
 
 #### 联系方式
 
-Tg：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
+TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
 #### 安装步骤
 
