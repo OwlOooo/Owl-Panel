@@ -193,7 +193,6 @@ install_and_start_all() {
     for service in "${services[@]}"; do
          docker-compose up -d ${service}
     done
-    manage_service pull owl_web
     
     echo -e "${GREEN}所有容器已启动。${NC}"
     read -p "按回车键返回菜单..."
