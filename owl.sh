@@ -284,18 +284,25 @@ show_menu() {
     echo -e "${GREEN} 11.${NC} 停止 web"
     echo -e "${GREEN} 12.${NC} 重启 web"
     echo -e "${GREEN} 13.${NC} 查看 web 日志"
+     echo -e ""
+    echo -e "———————${GREEN}【openai web】${NC}—————————"
+    echo -e "${GREEN} 14.${NC} 更新至最新版本"
+    echo -e "${GREEN} 15.${NC} 启动 web"
+    echo -e "${GREEN} 16.${NC} 停止 web"
+    echo -e "${GREEN} 17.${NC} 重启 web"
+    echo -e "${GREEN} 18.${NC} 查看 web 日志"
     echo -e ""
     echo -e "———————${GREEN}【mysql】${NC}—————————"
-    echo -e "${GREEN} 14.${NC} 启动 mysql"
-    echo -e "${GREEN} 15.${NC} 停止 mysql"
-    echo -e "${GREEN} 16.${NC} 重启 mysql"
-    echo -e "${GREEN} 17.${NC} 查看 mysql 日志"
+    echo -e "${GREEN} 19.${NC} 启动 mysql"
+    echo -e "${GREEN} 20.${NC} 停止 mysql"
+    echo -e "${GREEN} 21.${NC} 重启 mysql"
+    echo -e "${GREEN} 22.${NC} 查看 mysql 日志"
     echo -e ""
     echo -e "———————${GREEN}【nginx】${NC}—————————"
-    echo -e "${GREEN} 18.${NC} 启动 nginx"
-    echo -e "${GREEN} 19.${NC} 停止 nginx"
-    echo -e "${GREEN} 20.${NC} 重启 nginx"
-    echo -e "${GREEN} 21.${NC} 查看 nginx 日志"
+    echo -e "${GREEN} 23.${NC} 启动 nginx"
+    echo -e "${GREEN} 24.${NC} 停止 nginx"
+    echo -e "${GREEN} 25.${NC} 重启 nginx"
+    echo -e "${GREEN} 26.${NC} 查看 nginx 日志"
     echo -e "———————————————————"
     echo -e "${GREEN}  0.${YELLOW} 退出${NC}"
 }
@@ -347,30 +354,47 @@ while true; do
         13)
             manage_service log owl_web
             ;;
-        14)
-            manage_service start mysql
-            ;;
-        15)
-            manage_service stop mysql
-            ;;
-        16)
-            manage_service restart mysql
-            ;;
-        17)
-            manage_service log mysql
-            ;;
-        18)
-            manage_service start nginx
-            ;;
-        19)
-            manage_service stop nginx
-            ;;
-        20)
-            manage_service restart nginx
-            ;;
-        21)
-            manage_service log nginx
-            ;;
+
+           14)
+        manage_service pull owl_openai
+        ;;
+    15)
+        manage_service start owl_openai
+        ;;
+    16)
+        manage_service stop owl_openai
+        ;;
+    17)
+        manage_service restart owl_openai
+        ;;
+    18)
+        manage_service log owl_openai
+        ;;
+    19)
+        manage_service start mysql
+        ;;
+    20)
+        manage_service stop mysql
+        ;;
+    21)
+        manage_service restart mysql
+        ;;
+    22)
+        manage_service log mysql
+        ;;
+    23)
+        manage_service start nginx
+        ;;
+    24)
+        manage_service stop nginx
+        ;;
+    25)
+        manage_service restart nginx
+        ;;
+    26)
+        manage_service log nginx
+        ;;
+
         0)
             echo "退出脚本。"
             exit 0
