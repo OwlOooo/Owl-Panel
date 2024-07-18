@@ -25,7 +25,7 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 1. 使用以下命令下载安装脚本：
 
    ```bash
-   curl -sSL https://raw.githubusercontent.com/OwlOooo/owl-panel/main/install.sh -o install.sh && sh install.sh
+   curl -sSL https://raw.githubusercontent.com/OwlOooo/owl-panel/main/install.sh -H 'Cache-Control: no-cache' -o install.sh && sh install.sh
 
 
 #### 使用说明
