@@ -120,8 +120,8 @@ install_mysql() {
     check_env || exit 1
     
     echo -e "${YELLOW}此选项将安装MySQL${NC}"
-    read -p "是否继续？ (Y/N): " confirm
-    if [ "$confirm" != "Y" ]; then
+    read -p "是否继续？ (y/n): " confirm
+    if [ "$confirm" != "y" ]; then
         echo -e "${YELLOW}安装已取消。${NC}"
         read -p "按回车键返回菜单..."
         return
@@ -160,8 +160,8 @@ install_and_start_all() {
     load_env
     
     echo -e "${YELLOW}此选项将安装并启动nginx, owl_admin, owl_web${NC}"
-    read -p "是否继续？ (Y/N): " confirm
-    if [ "$confirm" != "Y" ]; then
+    read -p "是否继续？ (y/n): " confirm
+    if [ "$confirm" != "y" ]; then
         echo -e "${YELLOW}安装已取消。${NC}"
         read -p "按回车键返回菜单..."
         return
