@@ -184,71 +184,62 @@ install_and_start_all() {
     manage_service log owl_admin
 }
 
-# 安装 Docker 和 Docker Compose 的函数
 install_docker() {
-    # 检查是否存在 docker-compose.yml 文件
     if [ ! -f docker-compose.yml ]; then
-        echo -e "${RED}未找到 docker-compose.yml 文件，请先下载文件。${NC}"
+        echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     fi
     
-    # 检查是否存在 .env 文件
     if [ ! -f .env ]; then
-        echo -e "${RED}未找到 .env 文件，请先下载文件。${NC}"
+        echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
     fi
     
-    echo -e "${YELLOW}此选项将安装 Docker 和 Docker Compose${NC}"
+    check_env || exit 1
+    
+    echo -e "${YELLOW}此选项将安装docker，docker-compose${NC}"
 
-    echo -e "${GREEN}检查并安装 Docker 和 Docker Compose...${NC}"
-    # 如果 Docker 没有安装，则安装 Docker
+    echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
     if ! command -v docker &> /dev/null; then
-        echo -e "${GREEN}安装 Docker...${NC}"
-        # 检测系统架构并选择安装方法
-        ARCH=$(uname -m)
-        if [ "$ARCH" == "x86_64" ]; then
-            # 对于 x86_64 架构，使用 apt 安装 Docker
-            sudo apt-get update -y
-            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-            sudo apt-get install -y netcat
-            curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-            echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            sudo apt-get update -y
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-            sudo systemctl start docker
-            sudo systemctl enable docker
-        elif [ "$ARCH" == "aarch64" ]; then
-            # 对于 ARM 架构（如树莓派），使用 get.docker.com 脚本安装 Docker
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-        else
-            echo -e "${RED}不支持的架构：$ARCH。请手动安装 Docker。${NC}"
-            exit 1
-        fi
+        echo -e "${GREEN}安装Docker...${NC}"
+        # 更新系统并安装必要的软件包
+        sudo apt-get update -y
+        sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+        sudo apt-get -y install netcat
+        # 添加 Docker 的官方 GPG 密钥
+        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-        echo -e "${YELLOW}Docker 安装完毕。${NC}"
+        # 设置 Docker 的仓库
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+        # 更新 apt 包索引并安装最新版本的 Docker CE
+        sudo apt-get update -y
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+        # 启动 Docker 并设置开机自启
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        echo -e "${YELLOW}Docker安装完毕。${NC}"
     else
         echo -e "${YELLOW}Docker 已经安装。${NC}"
     fi
 
-    # 如果 Docker Compose 没有安装，则安装 Docker Compose
     if ! command -v docker-compose &> /dev/null; then
-        echo -e "${GREEN}安装 Docker Compose...${NC}"
+        echo -e "${GREEN}安装Docker Compose...${NC}"
         # 获取最新版本的 Docker Compose
         DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
-        
-        # 下载 Docker Compose
+
+        # 下载最新版本的 Docker Compose
         sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        
+
         # 赋予执行权限
         sudo chmod +x /usr/local/bin/docker-compose
-        
-        # 创建符号链接（可选）
+
+        # 创建软链接（可选）
         sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-        
-        echo -e "${YELLOW}Docker Compose 安装完毕。${NC}"
+        echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
     else
         echo -e "${YELLOW}Docker Compose 已经安装。${NC}"
     fi
