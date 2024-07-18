@@ -48,6 +48,3 @@ fi
 # 输出成功信息
 echo -e "${GREEN}已安装好脚本，输入owl命令即可使用脚本${NC}"
 
-# 调试信息：显示脚本内容
-echo -e "${GREEN}脚本内容如下：${NC}"
-cat /usr/local/bin/owl
