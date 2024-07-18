@@ -24,27 +24,11 @@ load_env() {
 
 # 端口检测函数
 check_ports() {
-    local ports=("$@")
-    if ! command -v nc &> /dev/null; then
-        echo -e "${GREEN}安装 nc...${NC}"
-        sudo apt-get update -y
-        sudo apt-get install -y netcat
-    fi
-    for port in "${ports[@]}"; do
-        if ! nc -zv "${SERVER_IP}" "$port" &>/dev/null; then
-            echo -e "${RED}端口 $port 未开放，请先开放端口。${NC}"
-            return 1
-        fi
-    done
     return 0
 }
 
 # 检测 MySQL 端口
 check_mysql_port() {
-    if ! nc -zv "${MYSQL_HOST}" "${MYSQL_PORT}" &>/dev/null; then
-        echo -e "${RED}MySQL 地址 ${MYSQL_HOST}:${MYSQL_PORT} 未开放，请先开放端口。${NC}"
-        return 1
-    fi
     return 0
 }
 
