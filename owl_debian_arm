@@ -5,7 +5,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
-COMPOSE_URL='https://raw.githubusercontent.com/OwlOooo/owl-panel/main/docker-compose.yml'
+COMPOSE_URL='https://raw.githubusercontent.com/OwlOooo/owl-panel/main/docker-compose-arm.yml'
 ENV_URL='https://raw.githubusercontent.com/OwlOooo/owl-panel/main/.env'
 
 # 标题函数
