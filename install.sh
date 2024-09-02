@@ -8,10 +8,16 @@ NC='\033[0m'
 # 检查操作系统类型
 os_type=$(grep -Ei 'centos|red hat|fedora' /etc/*release)
 
-# 根据操作系统类型选择下载URL
+# 检查是否为 ARM 架构
+is_arm=$(uname -m | grep -Ei 'arm|aarch64')
+
+# 根据操作系统类型和架构选择下载URL
 if [[ -n "$os_type" ]]; then
     echo -e "${GREEN}检测到CentOS系统，正在获取最新的Owl脚本...${NC}"
     script_url="https://raw.githubusercontent.com/OwlOooo/owl-panel/main/owl.sh"
+elif [[ -n "$is_arm" ]]; then
+    echo -e "${GREEN}检测到Debian ARM系统，正在获取最新的Owl ARM脚本...${NC}"
+    script_url="https://raw.githubusercontent.com/OwlOooo/Owl-Panel/main/owl_debian_arm.sh"
 else
     echo -e "${GREEN}检测到Debian系统，正在获取最新的Owl脚本...${NC}"
     script_url="https://raw.githubusercontent.com/OwlOooo/owl-panel/main/owl_debian.sh"
@@ -47,4 +53,3 @@ fi
 
 # 输出成功信息
 echo -e "${GREEN}已安装好脚本，输入owl命令即可使用脚本${NC}"
-
