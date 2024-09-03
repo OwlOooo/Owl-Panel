@@ -1,11 +1,13 @@
 #!/bin/sh
 
+# 定义脚本
+script_url="https://raw.githubusercontent.com/OwlOooo/owl-panel/main/owl.sh"
 # 定义颜色变量
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
-script_url="https://raw.githubusercontent.com/OwlOooo/owl-panel/main/owl.sh"
+
 
 
 
