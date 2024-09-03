@@ -8,6 +8,16 @@ NC='\033[0m' # No Color
 COMPOSE_URL='https://raw.githubusercontent.com/OwlOooo/owl-panel/main/docker-compose.yml'
 ENV_URL='https://raw.githubusercontent.com/OwlOooo/owl-panel/main/.env'
 
+OWL_DIR="/owl"
+
+# 创建 /owl 目录并进入
+create_and_enter_owl_dir() {
+    if [ ! -d "$OWL_DIR" ]; then
+        mkdir -p "$OWL_DIR"
+    fi
+    cd "$OWL_DIR"
+}
+
 # 标题函数
 StartTitle() {
     echo -e '  \033[0;1;36;96m欢迎使用猫头鹰订阅管理面板一键脚本\033[0m'
@@ -15,11 +25,11 @@ StartTitle() {
 
 # 读取 .env 文件
 load_env() {
-    if [ ! -f .env ]; then
+    if [ ! -f "$OWL_DIR/.env" ]; then
         echo -e "${RED}.env 文件不存在，请先下载 .env 文件。${NC}"
         return 1
     fi
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' "$OWL_DIR/.env" | xargs)
 }
 
 # 端口检测函数
@@ -34,7 +44,7 @@ check_mysql_port() {
 
 # .env 文件检查函数
 check_env() {
-    if grep -q "127.0.0.1" .env; then
+    if grep -q "127.0.0.1" "$OWL_DIR/.env"; then
         echo -e "${RED}检测到 .env 文件中的 MYSQL_HOST 或 DOMAIN 包含 127.0.0.1，请先修改为正确的 IP 地址。${NC}"
         read -p "按回车键返回菜单..."
         return 1
@@ -46,6 +56,8 @@ check_env() {
 manage_service() {
     local action=$1
     local service=$2
+
+    create_and_enter_owl_dir
 
     case $action in
         start)
@@ -93,6 +105,8 @@ manage_service() {
 }
 
 download_compose() {
+    create_and_enter_owl_dir
+
     echo -e "${GREEN}从URL获取docker-compose.yml文件...${NC}"
     curl -o docker-compose.yml ${COMPOSE_URL}
     curl -o .env ${ENV_URL}
@@ -107,6 +121,8 @@ download_compose() {
 }
 
 install_mysql() {
+    create_and_enter_owl_dir
+
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
@@ -152,11 +168,13 @@ install_mysql() {
 }
 
 install_and_start_all() {
+    create_and_enter_owl_dir
+
     if [ ! -f .env ]; then
         echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         exit 1
-    fi
+    }
     
     check_env || exit 1
     load_env
@@ -167,7 +185,7 @@ install_and_start_all() {
         echo -e "${YELLOW}安装已取消。${NC}"
         read -p "按回车键返回菜单..."
         return
-    fi
+    }
 
     check_mysql_port || {
         echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
@@ -184,20 +202,20 @@ install_and_start_all() {
     manage_service log owl_admin
 }
 
-
-
 install_docker() {
+    create_and_enter_owl_dir
+
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         return 1
-    fi
+    }
     
     if [ ! -f .env ]; then
         echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         return 1
-    fi
+    }
     
     check_env || return 1
     
@@ -268,8 +286,6 @@ install_docker() {
         echo -e "${YELLOW}Docker Compose 已经安装。${NC}"
     fi
 }
-
-
 
 # 显示菜单
 show_menu() {
