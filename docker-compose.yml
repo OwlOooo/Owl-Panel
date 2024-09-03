@@ -1,6 +1,6 @@
 services:
   mysql:
-    image:biarms/mysql:5.7
+    image: biarms/mysql:5.7
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
