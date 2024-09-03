@@ -274,8 +274,7 @@ install_docker() {
                 sudo pip3 install docker-compose
             elif [ "$OS" == "debian" ] || [ "$OS" == "ubuntu" ]; then
                 sudo apt-get update
-                sudo apt-get install -y python3-pip
-                sudo pip3 install docker-compose
+                sudo apt-get install -y docker-compose
             else
                 echo -e "${RED}不支持的操作系统。${NC}"
                 return 1
