@@ -15,6 +15,12 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 - **Centos 7.6+**
 - **Debian 11+**
 - **内存至少2G**
+
+#### 支持架构
+
+- **amd64**
+- **arm64**
+
   
 #### 3X-UI
 
