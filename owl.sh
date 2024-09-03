@@ -45,7 +45,7 @@ check_mysql_port() {
 # .env 文件检查函数
 check_env() {
     if grep -q "127.0.0.1" "$OWL_DIR/.env"; then
-        echo -e "${RED}检测到 .env 文件中的 MYSQL_HOST 或 DOMAIN 包含 127.0.0.1，请先修改为正确的 IP 地址。${NC}"
+        echo -e "${RED}检测到 .env 文件中的 MYSQL_HOST 或 DOMAIN 包含 127.0.0.1，请先修改为正确的 IP 地址。默认文件目录：$OWL_DIR${NC}"
         read -p "按回车键返回菜单..."
         return 1
     fi
@@ -111,7 +111,7 @@ download_compose() {
     curl -o docker-compose.yml ${COMPOSE_URL}
     curl -o .env ${ENV_URL}
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}docker-compose.yml和.env文件下载成功，请修改.env配置文件内的信息。${NC}"
+        echo -e "${GREEN}docker-compose.yml和.env文件下载成功，请修改.env配置文件内的信息。默认文件目录：$OWL_DIR ${NC}"
     else
         echo -e "${RED}docker-compose.yml和.env文件下载失败，请检查URL是否正确。${NC}"
         read -p "按回车键返回菜单..."
@@ -173,10 +173,10 @@ install_and_start_all() {
     if [ ! -f .env ]; then
         echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
-    }
+        return 1
+    fi
     
-    check_env || exit 1
+    check_env || return 1
     load_env
     
     echo -e "${YELLOW}此选项将安装并启动nginx, owl_admin, owl_web${NC}"
@@ -185,13 +185,13 @@ install_and_start_all() {
         echo -e "${YELLOW}安装已取消。${NC}"
         read -p "按回车键返回菜单..."
         return
-    }
+    fi
 
-    check_mysql_port || {
+    if ! check_mysql_port; then
         echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
-    }
+        return 1
+    fi
 
     services=("owl_admin" "owl_web" "nginx")
     for service in "${services[@]}"; do
@@ -209,13 +209,13 @@ install_docker() {
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         return 1
-    }
+     fi
     
     if [ ! -f .env ]; then
         echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
         return 1
-    }
+     fi
     
     check_env || return 1
     
