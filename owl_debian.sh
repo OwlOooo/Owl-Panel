@@ -188,37 +188,32 @@ install_docker() {
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
+        return 1
     fi
     
     if [ ! -f .env ]; then
         echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
+        return 1
     fi
     
-    check_env || exit 1
+    check_env || return 1
     
     echo -e "${YELLOW}此选项将安装docker，docker-compose${NC}"
 
     echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
+    
+    # 检测架构
+    architecture=$(dpkg --print-architecture)
+    
     if ! command -v docker &> /dev/null; then
         echo -e "${GREEN}安装Docker...${NC}"
-        # 更新系统并安装必要的软件包
-        sudo apt-get update -y
+        sudo apt-get update
         sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-        sudo apt-get -y install netcat
-        # 添加 Docker 的官方 GPG 密钥
         curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-        # 设置 Docker 的仓库
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-        # 更新 apt 包索引并安装最新版本的 Docker CE
-        sudo apt-get update -y
+        echo "deb [arch=${architecture} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
         sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-        # 启动 Docker 并设置开机自启
         sudo systemctl start docker
         sudo systemctl enable docker
         echo -e "${YELLOW}Docker安装完毕。${NC}"
@@ -228,17 +223,17 @@ install_docker() {
 
     if ! command -v docker-compose &> /dev/null; then
         echo -e "${GREEN}安装Docker Compose...${NC}"
-        # 获取最新版本的 Docker Compose
-        DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
-
-        # 下载最新版本的 Docker Compose
-        sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-        # 赋予执行权限
-        sudo chmod +x /usr/local/bin/docker-compose
-
-        # 创建软链接（可选）
-        sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+        if [ "$architecture" = "amd64" ]; then
+            # AMD64 架构安装方法
+            DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+            sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+        else
+            # ARM 架构安装方法
+            sudo apt-get update
+            sudo apt-get install -y docker-compose
+        fi
         echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
     else
         echo -e "${YELLOW}Docker Compose 已经安装。${NC}"
