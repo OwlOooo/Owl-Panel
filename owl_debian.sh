@@ -184,6 +184,8 @@ install_and_start_all() {
     manage_service log owl_admin
 }
 
+
+
 install_docker() {
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
@@ -203,17 +205,34 @@ install_docker() {
 
     echo -e "${GREEN}检查并安装Docker和Docker Compose...${NC}"
     
+    # 检测系统类型
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS=$ID
+    else
+        OS=$(uname -s)
+    fi
+    
     # 检测架构
-    architecture=$(dpkg --print-architecture)
+    architecture=$(uname -m)
     
     if ! command -v docker &> /dev/null; then
         echo -e "${GREEN}安装Docker...${NC}"
-        sudo apt-get update
-        sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        echo "deb [arch=${architecture} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update
-        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        if [ "$OS" == "centos" ]; then
+            sudo yum install -y yum-utils
+            sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+            sudo yum install -y docker-ce docker-ce-cli containerd.io
+        elif [ "$OS" == "debian" ] || [ "$OS" == "ubuntu" ]; then
+            sudo apt-get update
+            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+            curl -fsSL https://download.docker.com/linux/${OS}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${OS} $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        else
+            echo -e "${RED}不支持的操作系统。${NC}"
+            return 1
+        fi
         sudo systemctl start docker
         sudo systemctl enable docker
         echo -e "${YELLOW}Docker安装完毕。${NC}"
@@ -223,7 +242,7 @@ install_docker() {
 
     if ! command -v docker-compose &> /dev/null; then
         echo -e "${GREEN}安装Docker Compose...${NC}"
-        if [ "$architecture" = "amd64" ]; then
+        if [ "$architecture" = "x86_64" ]; then
             # AMD64 架构安装方法
             DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
             sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -231,14 +250,26 @@ install_docker() {
             sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
         else
             # ARM 架构安装方法
-            sudo apt-get update
-            sudo apt-get install -y docker-compose
+            if [ "$OS" == "centos" ]; then
+                sudo yum install -y epel-release
+                sudo yum install -y python3-pip
+                sudo pip3 install docker-compose
+            elif [ "$OS" == "debian" ] || [ "$OS" == "ubuntu" ]; then
+                sudo apt-get update
+                sudo apt-get install -y python3-pip
+                sudo pip3 install docker-compose
+            else
+                echo -e "${RED}不支持的操作系统。${NC}"
+                return 1
+            fi
         fi
         echo -e "${YELLOW}Docker Compose安装完毕。${NC}"
     else
         echo -e "${YELLOW}Docker Compose 已经安装。${NC}"
     fi
 }
+
+
 
 # 显示菜单
 show_menu() {
