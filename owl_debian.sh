@@ -51,12 +51,12 @@ manage_service() {
         start)
             if [ "$(docker inspect -f '{{.State.Running}}' ${service})" == "true" ]; then
                 echo -e "${YELLOW}${service} 容器已经启动。${NC}"
-                 docker logs --tail 300 -f ${service}
+                 docker-compose logs --tail 300 -f ${service}
             else
                 echo -e "${GREEN}启动 ${service} 容器...${NC}"
                 docker-compose start ${service}
                 echo -e "${GREEN}${service} 容器已启动。${NC}"
-                 docker logs --tail 300 -f ${service}
+                 docker-compose logs --tail 300 -f ${service}
             fi
             ;;
         stop)
@@ -80,11 +80,11 @@ manage_service() {
             docker-compose up -d ${service}
             docker images -f "dangling=true" -q | xargs -r docker rmi
             docker volume prune -f
-           docker logs --tail 300 -f ${service}
+           docker-compose logs --tail 300 -f ${service}
             ;;
         log)
             echo -e "${GREEN}查看 ${service} 容器日志...${NC}"
-           docker logs --tail 300 -f ${service}
+           docker-compose logs --tail 300 -f ${service}
             ;;
         *)
             echo -e "${RED}无效操作: ${action}${NC}"
