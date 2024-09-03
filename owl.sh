@@ -126,16 +126,16 @@ install_mysql() {
     if [ ! -f docker-compose.yml ]; then
         echo -e "${RED}未找到docker-compose.yml文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
+        return 1
     fi
     
     if [ ! -f .env ]; then
         echo -e "${RED}未找到.env文件，请先下载文件。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
+        return 1
     fi
     
-    check_env || exit 1
+    check_env || return 1
     
     echo -e "${YELLOW}此选项将安装MySQL${NC}"
     read -p "是否继续？ (y/n): " confirm
@@ -152,16 +152,16 @@ install_mysql() {
     if [ $? -ne 0 ]; then
         echo -e "${RED}MySQL 容器安装过程中发生错误，请检查docker-compose.yml文件是否正确。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
+        return 1
     fi
 
     sleep 10 # 等待 MySQL 容器完全启动
 
-    check_mysql_port || {
+    if ! check_mysql_port; then
         echo -e "${RED}MySQL 端口未开放，请检查配置。${NC}"
         read -p "按回车键返回菜单..."
-        exit 1
-    }
+        return 1
+    fi
 
     echo -e "${GREEN}MySQL 容器安装并启动成功。${NC}"
     read -p "按回车键返回菜单..."
