@@ -14,6 +14,7 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
 - **Centos 7.6+**
 - **Debian 11+**
+- **Ubuntu**
 - **内存至少2G**
 
 #### 支持架构
@@ -43,9 +44,6 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
 
   ```markdown
-  - 服务器IP，换成自己的服务器IP或者域名，如果加了SSL，改成https
-   SERVER_IP=127.0.0.1
-
    mysql 换成mysql的地址
    MYSQL_HOST=127.0.0.1
 
@@ -58,7 +56,7 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
    mysql密码，请修改为复杂的密码
    MYSQL_ROOT_PASSWORD=123456
 
-   mysql初始化数据库
+   mysql初始化数据库--无需更改
    MYSQL_DATABASE=nginx
 
    owl数据库
@@ -70,7 +68,7 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
    owl客户端面板端口
    WEB_PORT=8281
 
-   owl后台管理api地址,api url就是服务器IP加后台管理端口
+   owl后台管理api地址,api url就是服务器IP加后台管理端口，如果后端换成域名后，改为域名，加了https后这里也要改
    API_URL=http://127.0.0.1:8989/api
 
 #### 安装MySQL
