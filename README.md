@@ -90,6 +90,7 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
 ---
 
+
 #### 3X-UI设置
 
 - 一定要按照下图所示进行更改，其中`面板设置->常规-面板 url 根路径` 和 `面板设置->订阅设置->URI 路径`可自定义，会在猫头鹰面板上添加服务器时用到。
@@ -115,4 +116,10 @@ TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
 
 
+#### 开发不易，您的支持就是作者继续的动力，为爱发电：
+![5159fcbdd535497a4180e51e8002b41](https://github.com/user-attachments/assets/f92756b8-bfc3-4266-a1c5-da9445278fa5)
+
+
+```bash
+TC22Sk3AFvhFrhZNaWuHEwFPj214Bxo6XB
 
