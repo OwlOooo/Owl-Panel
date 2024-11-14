@@ -9,6 +9,8 @@ Owl-Panel 是一个用于管理代理节点的面板，后端对接3x-ui面板�
 
 TG交流群：[点击这里](https://t.me/+BRD15JUPyhxhZDFh)
 
+
+支持作者：[点击这里](https://github.com/OwlOooo/Owl-Panel/blob/main/README.md#%E5%BC%80%E5%8F%91%E4%B8%8D%E6%98%93%E6%82%A8%E7%9A%84%E6%94%AF%E6%8C%81%E5%B0%B1%E6%98%AF%E4%BD%9C%E8%80%85%E7%BB%A7%E7%BB%AD%E7%9A%84%E5%8A%A8%E5%8A%9B%E4%B8%BA%E7%88%B1%E5%8F%91%E7%94%B5)
 #### 支持系统定制
 
 联系：@Owl_8888
